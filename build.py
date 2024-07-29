@@ -99,9 +99,12 @@ def main(args):
         return 0
     if args[1] == "install":
         print("Installing...")
-        if not os.path.exists("~/.local/share/fonts"):
-            os.makedirs("~/.local/share/fonts")
-        os.system(f"cp -r {BUILD_DIR}/SarasaNerds ~/.local/share/fonts/")
+
+        fontsDir = f"{os.environ.get('HOME')}/.local/share/fonts"
+        if not os.path.exists(fontsDir):
+            os.makedirs(fontsDir)
+
+        os.system(f"cp -r {BUILD_DIR}/SarasaNerds {fontsDir}")
         os.system("fc-cache -fv")
         print("Install done.")
         return 0
@@ -111,3 +114,6 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv)
+
+    import os
+    print(os.path.exists(f"{os.environ.get("HOME")}/.local/share/fonts"))
