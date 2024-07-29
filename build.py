@@ -36,18 +36,22 @@ def download(url, filename):
             print(f"\rDownloading... {size}/{total_size} [{size * 100 / total_size:.2f}%]", end="")
     print()
 
+def _7z(file):
+    print(f"Extracting ... {file}")
+    # Extract code here
+    archive = py7zr.SevenZipFile(f"{DOWNLOAD_DIR}/{file}", mode="r")
+    archive.extractall(f"{BUILD_DIR}/Sarasa")
+    archive.close()
+    print("Extract done.")
+
 def build():
     print("Building...")
 
     # Download Sarasa Gothic
-    download("https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.16/Sarasa-TTF-1.0.16.7z", "Sarasa.7z")
-    
-    # Extract Sarasa Gothic
-    print("Extracting Sarasa.7z ...")
-    archive = py7zr.SevenZipFile(f"{DOWNLOAD_DIR}/Sarasa.7z", mode="r")
-    archive.extractall(f"{BUILD_DIR}/Sarasa")
-    archive.close()
-    print("Extract done.")
+    download("https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.16/SarasaFixed-TTF-1.0.16.7z", "Fixed.7z")
+
+    # Extract Sarasa
+    _7z("Fixed.7z")
 
     # Remove non SC files
     for file in os.listdir(f"{BUILD_DIR}/Sarasa"):
@@ -78,7 +82,7 @@ def main(args):
         return 1
     
     if args.__len__() < 2:
-        print("Usage: python3 build.py [clean|deps|build]")
+        print("Usage: python3 build.py [clean|deps|build|install]")
         return 1
     
     if args[1] == "clean":
@@ -93,7 +97,17 @@ def main(args):
     if args[1] == "build":
         build()
         return 0
-
+    if args[1] == "install":
+        print("Installing...")
+        if not os.path.exists("~/.local/share/fonts"):
+            os.makedirs("~/.local/share/fonts")
+        os.system(f"cp -r {BUILD_DIR}/SarasaNerds ~/.local/share/fonts/")
+        os.system("fc-cache -fv")
+        print("Install done.")
+        return 0
+    
+    print("Usage: python3 build.py [clean|deps|build|install]")
+    return 1
 
 if __name__ == "__main__":
     main(sys.argv)
